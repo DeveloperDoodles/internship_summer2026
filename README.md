@@ -77,6 +77,7 @@ Smaller experiments from earlier in the internship, in [`practice/`](practice/):
 internship_summer2026/
 ├── churn-prediction/           ⭐ Main project
 │   ├── custfinal.py            Full pipeline: clean → train → evaluate
+│   ├── improve_recall.py       Class weighting and threshold tuning to catch more churners
 │   ├── results.txt             Saved console output from the last run
 │   └── WA_Fn-UseC_-Telco-Customer-Churn.csv
 ├── practice/                   Smaller ML exercises + datasets
@@ -97,11 +98,28 @@ python custfinal.py
 
 The script reads the CSV from the current folder, so run it from inside `churn-prediction/`.
 
+## 🎯 Improving recall
+
+The baseline misses about half of churners. `churn-prediction/improve_recall.py` tries two fixes on the same split:
+
+| Variant | Threshold | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| Baseline | 0.50 | 0.798 | 0.645 | 0.529 | 0.582 | 0.840 |
+| Balanced class weights | 0.50 | 0.735 | 0.500 | **0.800** | 0.615 | 0.840 |
+| Balanced + tuned threshold | 0.59 | 0.761 | 0.536 | 0.730 | **0.618** | 0.840 |
+
+- **Class weighting** (`class_weight="balanced"`) raises recall from 0.53 to 0.80, so the model flags about 4 in 5 churners. The cost is more false alarms, and precision falls to 0.50.
+- **Tuning the threshold** on training data (cross-validated, never the test set) gives the best F1, but only slightly better than class weighting alone.
+- **ROC-AUC stays at 0.84** in every variant. The model ranks customers the same way; only the cutoff changes.
+
+**Which to use:** if the goal is to find as many churners as possible for retention offers, use *balanced class weights*. If offers are expensive and false alarms matter, keep the baseline.
+
 ## 🔮 Next steps
 
-- [ ] Tune the classification threshold to raise recall (catch more churners)
-- [ ] Try class weighting or SMOTE to handle the 26/74 imbalance
-- [ ] Add ROC-AUC and a precision-recall curve
+- [x] Raise recall to catch more churners (class weighting and threshold tuning)
+- [x] Add ROC-AUC to the evaluation
+- [ ] Try SMOTE to handle the 26/74 class imbalance
+- [ ] Add a precision-recall curve
 - [ ] Use all 19 features instead of the selected 10 and check whether recall improves
 
 ---
