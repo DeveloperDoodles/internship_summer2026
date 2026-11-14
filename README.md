@@ -1,175 +1,109 @@
-# internship_summer2026
-DATASET OVERVIEW
-==================================================
-Rows: 7043
-Columns: 21
+# 📊 Summer 2026 Internship: Machine Learning Projects
 
-First 5 rows:
-   customerID  gender  SeniorCitizen  ... MonthlyCharges TotalCharges  Churn
-0  7590-VHVEG  Female              0  ...          29.85        29.85     No
-1  5575-GNVDE    Male              0  ...          56.95       1889.5     No
-2  3668-QPYBK    Male              0  ...          53.85       108.15    Yes
-3  7795-CFOCW    Male              0  ...          42.30      1840.75     No
-4  9237-HQITU  Female              0  ...          70.70       151.65    Yes
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-F7931E?logo=scikitlearn&logoColor=white)
+![pandas](https://img.shields.io/badge/pandas-data-150458?logo=pandas&logoColor=white)
+![Status](https://img.shields.io/badge/status-in%20progress-6366f1)
 
-[5 rows x 21 columns]
+A collection of machine learning experiments from my summer 2026 internship. The main project predicts **customer churn** for a telecom company. The `practice/` folder holds smaller exercises on house prices and Titanic survival.
 
-DATA CLEANING DONE
-==================================================
-Missing values after cleaning: 0
+---
 
-Churn distribution:
-Churn
-0    5174
-1    1869
-Name: count, dtype: int64
+## ⭐ Featured project: Telco Customer Churn
 
-FEATURE SELECTION
-==================================================
-Selected features: ['tenure', 'MonthlyCharges', 'TotalCharges', 'SeniorCitizen', 'Contract', 'InternetService', 'PaymentMethod', 'PaperlessBilling', 'TechSupport', 'OnlineSecurity']
-Shape after one-hot encoding: (7043, 16)
+**Goal:** Predict which customers will cancel their service so the business can target them with retention offers.
 
-TRAIN-TEST SPLIT
-==================================================
-Training samples: 5634
-Testing samples: 1409
+| | |
+|---|---|
+| **Dataset** | IBM Telco Customer Churn (7,043 customers, 21 columns) |
+| **Problem type** | Binary classification (`Churn`: Yes / No) |
+| **Class balance** | 26.5% churned · 73.5% stayed |
+| **Models compared** | Logistic Regression · Decision Tree · Random Forest · K-Nearest Neighbors |
 
+### 🏆 Results
 
-============================================================
-LOGISTIC REGRESSION RESULTS
-============================================================
-Accuracy:  0.7977
-Precision: 0.645
-Recall:    0.5294
-F1 Score:  0.5815
+![Model comparison chart](docs/model-comparison.svg)
 
-Confusion Matrix:
-[[926 109]
- [176 198]]
+| Model | Accuracy | Precision | Recall | F1 Score |
+|---|:---:|:---:|:---:|:---:|
+| **Logistic Regression** 🥇 | **0.798** | **0.645** | **0.529** | **0.582** |
+| Random Forest | 0.777 | 0.595 | 0.503 | 0.545 |
+| K-Nearest Neighbors | 0.768 | 0.577 | 0.473 | 0.520 |
+| Decision Tree | 0.723 | 0.479 | 0.505 | 0.492 |
 
-Classification Report:
-              precision    recall  f1-score   support
+**Logistic Regression** gave the best overall balance and was the top model on every metric. It's also the simplest and easiest to explain to a non-technical audience.
 
-    No Churn       0.84      0.89      0.87      1035
-       Churn       0.64      0.53      0.58       374
+### 🔍 Key takeaways
 
-    accuracy                           0.80      1409
-   macro avg       0.74      0.71      0.72      1409
-weighted avg       0.79      0.80      0.79      1409
+- **Accuracy alone is misleading here.** Always guessing "no churn" would already score about 73%, so F1 score is the more useful number.
+- **The best model catches about half of churners.** Recall is 0.53, so roughly 1 in 2 customers who leave is still missed. Improving that is the main next step.
+- **Logistic Regression confusion matrix** (test set, n = 1,409):
 
+  |  | Predicted: stay | Predicted: churn |
+  |---|:---:|:---:|
+  | **Actual: stay** | 926 ✅ | 109 |
+  | **Actual: churn** | 176 | 198 ✅ |
 
-============================================================
-DECISION TREE RESULTS
-============================================================
-Accuracy:  0.7225
-Precision: 0.4785
-Recall:    0.5053
-F1 Score:  0.4915
+### ⚙️ Pipeline
 
-Confusion Matrix:
-[[829 206]
- [185 189]]
+```
+Raw CSV ─► Clean ─► Select 10 features ─► One-hot encode ─► Split 80/20 (stratified) ─► Scale ─► Train 4 models ─► Compare
+```
 
-Classification Report:
-              precision    recall  f1-score   support
+1. **Clean:** convert `TotalCharges` to numeric and fill the 11 blank values with the median. Map `Churn` to 0/1.
+2. **Features:** tenure, monthly and total charges, senior status, contract type, internet service, payment method, paperless billing, tech support, and online security.
+3. **Split:** 5,634 training and 1,409 test samples, `random_state=42`, stratified on churn.
+4. **Scale and train:** standardize features, then fit each model.
 
-    No Churn       0.82      0.80      0.81      1035
-       Churn       0.48      0.51      0.49       374
+---
 
-    accuracy                           0.72      1409
-   macro avg       0.65      0.65      0.65      1409
-weighted avg       0.73      0.72      0.72      1409
+## 🧪 Practice exercises
 
+Smaller experiments from earlier in the internship, in [`practice/`](practice/):
 
-============================================================
-RANDOM FOREST RESULTS
-============================================================
-Accuracy:  0.7771
-Precision: 0.5949
-Recall:    0.5027
-F1 Score:  0.5449
+| Topic | Files | What it covers |
+|---|---|---|
+| House prices (Melbourne) | `linearreg.py`, `housepricesdecisiontree.py`, `housepricesrandomtree.py`, `missingprices.py`, `categoricalvariables.py` | Regression, handling missing data and categorical variables |
+| Pipelines & validation | `pipelines.py`, `crossvalidation.py`, `dataleakage.py` | Building pipelines, cross-validation, avoiding data leakage |
+| Gradient boosting | `boostedRTR.py` | XGBoost regression |
+| Titanic survival | `titanicproj.py`, `titanproj.py`, `titanforest.py`, `titanrandfor.py` | Classification with tree-based models |
+| Sandbox | `trial.py` | Scratch work |
 
-Confusion Matrix:
-[[907 128]
- [186 188]]
+---
 
-Classification Report:
-              precision    recall  f1-score   support
+## 📁 Repository layout
 
-    No Churn       0.83      0.88      0.85      1035
-       Churn       0.59      0.50      0.54       374
+```
+internship_summer2026/
+├── churn-prediction/           ⭐ Main project
+│   ├── custfinal.py            Full pipeline: clean → train → evaluate
+│   ├── results.txt             Saved console output from the last run
+│   └── WA_Fn-UseC_-Telco-Customer-Churn.csv
+├── practice/                   Smaller ML exercises + datasets
+├── docs/
+│   └── model-comparison.svg    Results chart
+└── README.md
+```
 
-    accuracy                           0.78      1409
-   macro avg       0.71      0.69      0.70      1409
-weighted avg       0.77      0.78      0.77      1409
+## 🚀 Run it yourself
 
+Requires Python 3.10+ with `pandas`, `scikit-learn`, and `numpy`.
 
-============================================================
-K-NEAREST NEIGHBORS RESULTS
-============================================================
-Accuracy:  0.7679
-Precision: 0.5765
-Recall:    0.4733
-F1 Score:  0.5198
+```bash
+pip install pandas scikit-learn numpy
+cd churn-prediction
+python custfinal.py
+```
 
-Confusion Matrix:
-[[905 130]
- [197 177]]
+The script reads the CSV from the current folder, so run it from inside `churn-prediction/`.
 
-Classification Report:
-              precision    recall  f1-score   support
+## 🔮 Next steps
 
-    No Churn       0.82      0.87      0.85      1035
-       Churn       0.58      0.47      0.52       374
+- [ ] Tune the classification threshold to raise recall (catch more churners)
+- [ ] Try class weighting or SMOTE to handle the 26/74 imbalance
+- [ ] Add ROC-AUC and a precision-recall curve
+- [ ] Use all 19 features instead of the selected 10 and check whether recall improves
 
-    accuracy                           0.77      1409
-   macro avg       0.70      0.67      0.68      1409
-weighted avg       0.76      0.77      0.76      1409
+---
 
-
-============================================================
-FINAL MODEL COMPARISON
-============================================================
-              Model  Accuracy  Precision  Recall  F1 Score
-Logistic Regression    0.7977     0.6450  0.5294    0.5815
-      Random Forest    0.7771     0.5949  0.5027    0.5449
-K-Nearest Neighbors    0.7679     0.5765  0.4733    0.5198
-      Decision Tree    0.7225     0.4785  0.5053    0.4915
-
-============================================================
-BEST PERFORMING MODEL
-============================================================
-Model: Logistic Regression
-F1 Score: 0.5815
-Accuracy: 0.7977
-
-============================================================
-SAMPLE PREDICTIONS (Logistic Regression)
-============================================================
- Actual Churn  Predicted Churn  Churn Probability
-            0                0             0.0495
-            0                1             0.5957
-            0                0             0.0839
-            0                0             0.4372
-            0                0             0.0195
-            0                1             0.5451
-            0                0             0.4510
-            0                0             0.1238
-            0                0             0.0035
-            1                0             0.4816
-
-============================================================
-PROJECT SUMMARY
-============================================================
-Dataset: WA_Fn-UseC_-Telco-Customer-Churn.csv
-Problem Type: Binary Classification
-Target: Customer Churn (Yes/No)
-Models Compared:
-1. Logistic Regression
-2. Decision Tree Classifier
-3. Random Forest Classifier
-4. K-Nearest Neighbors Classifier
-Evaluation Metrics: Accuracy, Precision, Recall, F1 Score
-Best Model: Logistic Regression
-Best F1 Score: 0.5815
-============================================================
+<p align="center"><sub>Built during the Summer 2026 internship · Python · scikit-learn · pandas</sub></p>
